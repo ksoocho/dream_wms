@@ -1,0 +1,889 @@
+-----------------------------------
+-- cks_wms_func (사용하지 않음)
+-----------------------------------
+DROP TABLE cks_wms_func;
+
+CREATE TABLE cks_wms_func( 
+ FUNCTION_ID         INT           NOT NULL    auto_increment
+,FUNCTION_NAME       VARCHAR(480)  NOT NULL    
+,ENABLED_FLAG        VARCHAR(1)    NOT NULL    
+,CREATION_DATE       DATETIME    NOT NULL    
+,CREATED_BY          INT         NOT NULL    
+,LAST_UPDATE_DATE    DATETIME    NOT NULL    
+,LAST_UPDATED_BY     INT         NOT NULL    
+,PRIMARY KEY (FUNCTION_ID) 
+) 
+COMMENT="CKS WMS Function"
+;
+
+-----------------------------------
+-- CKS WMS Menu (사용하지 않음)
+-- Table : cks_wms_menu
+-----------------------------------
+DROP TABLE cks_wms_menu;
+
+CREATE TABLE cks_wms_menu( 
+ MENU_ID           INT    NOT NULL    auto_increment
+,ENTRY_SEQUENCE    INT    NOT NULL    
+,SUB_MENU_ID       INT        
+,FUNCTION_ID       INT        
+,ENABLED_FLAG      VARCHAR(1)  NOT NULL    
+,CREATION_DATE     DATETIME    NOT NULL    
+,CREATED_BY        INT         NOT NULL    
+,LAST_UPDATE_DATE  DATETIME    NOT NULL    
+,LAST_UPDATED_BY   INT         NOT NULL    
+,PRIMARY KEY (MENU_ID) 
+) 
+COMMENT="CKS WMS Menu"
+;
+
+-----------------------------------
+-- cks_wms_user
+-----------------------------------
+DROP TABLE cks_wms_user;
+
+CREATE TABLE cks_wms_user( 
+ USER_ID                    INT    NOT NULL    auto_increment
+,USER_NAME                  VARCHAR(100)    NOT NULL    
+,ENCRYPTED_USER_PASSWORD    VARCHAR(100)    NOT NULL    
+,ENABLED_FLAG               VARCHAR(1)      NOT NULL    
+,START_DATE                 DATETIME        NOT NULL    
+,END_DATE                   DATETIME        
+,USER_DESCRIPTION           VARCHAR(240)        
+,EMAIL_ADDRESS              VARCHAR(240)        
+,LAST_LOGON_DATE            DATETIME        
+,CREATION_DATE              DATETIME    NOT NULL    
+,CREATED_BY                 INT         NOT NULL    
+,LAST_UPDATE_DATE           DATETIME    NOT NULL    
+,LAST_UPDATED_BY            INT         NOT NULL    
+,PRIMARY KEY (USER_ID) 
+) 
+COMMENT="CKS WMS User(fnd_user)"
+;
+
+INSERT INTO cks_wms_user (
+USER_NAME,ENCRYPTED_USER_PASSWORD,ENABLED_FLAG ,START_DATE,END_DATE ,USER_DESCRIPTION,EMAIL_ADDRESS     
+,LAST_LOGON_DATE,CREATION_DATE ,CREATED_BY ,LAST_UPDATE_DATE,LAST_UPDATED_BY   
+) VALUES ( 'ksoocho',HEX(AES_ENCRYPT('k13837', 'cksoowms')), 'Y', SYSDATE(), NULL, 'CKS WMS Admin', NULL,
+NULL,SYSDATE(),-1,SYSDATE(),-1);
+
+-----------------------------------
+-- CKS WMS Responsibility
+-- Table : cks_wms_resp
+-- ORGANIZATION_ID 추가(EX)
+-----------------------------------
+DROP TABLE cks_wms_resp;
+
+CREATE TABLE cks_wms_resp( 
+ RESPONSIBILITY_ID      INT           NOT NULL  auto_increment
+,RESPONSIBILITY_NAME    VARCHAR(240)  NOT NULL
+,MENU_ID                INT           
+,ENABLED_FLAG           VARCHAR(1)    NOT NULL
+,ORGANIZATION_ID        INT           NOT NULL
+,EX_SUBINV_TYPE         VARCHAR(10)   NOT NULL 
+,EX_SUBINV_DETAIL       VARCHAR(10)   NOT NULL 
+,CREATION_DATE          DATETIME      NOT NULL
+,CREATED_BY             INT           NOT NULL
+,LAST_UPDATE_DATE       DATETIME      NOT NULL
+,LAST_UPDATED_BY        INT           NOT NULL
+,PRIMARY KEY (RESPONSIBILITY_ID) 
+) 
+COMMENT="CKS WMS Responsibility"
+;
+
+INSERT INTO cks_wms_resp (
+RESPONSIBILITY_NAME,MENU_ID,ENABLED_FLAG,ORGANIZATION_ID,EX_SUBINV_TYPE  ,EX_SUBINV_DETAIL 
+,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY) VALUES (
+'CKS HQ Manager', NULL, 'Y',1001, 'ALL','ALL',SYSDATE(),-1,SYSDATE(),-1 );
+
+INSERT INTO cks_wms_resp (
+RESPONSIBILITY_NAME,MENU_ID,ENABLED_FLAG,ORGANIZATION_ID,EX_SUBINV_TYPE  ,EX_SUBINV_DETAIL 
+,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY) VALUES (
+'CKS Store#1 Manager', NULL, 'Y',1002, 'ALL','ALL',SYSDATE(),-1,SYSDATE(),-1 );
+
+INSERT INTO cks_wms_resp (
+RESPONSIBILITY_NAME,MENU_ID,ENABLED_FLAG,ORGANIZATION_ID,EX_SUBINV_TYPE  ,EX_SUBINV_DETAIL 
+,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY) VALUES (
+'CKS Truck#1 Manager', NULL, 'Y',1003, 'ALL','ALL',SYSDATE(),-1,SYSDATE(),-1 );
+
+-----------------------------------
+-- CKS WMS User Responsibility
+-- Table : cks_wms_furg
+--  -. 사용자에 대한 권한 부여
+-----------------------------------
+DROP TABLE cks_wms_furg;
+
+CREATE TABLE cks_wms_furg( 
+ USER_ID              INT         NOT NULL
+,RESPONSIBILITY_ID    INT         NOT NULL
+,ENABLED_FLAG         VARCHAR(1)  NOT NULL
+,START_DATE           DATETIME    NOT NULL
+,END_DATE             DATETIME    
+,AUTH_DESCRIPTION     VARCHAR(240)    
+,DEFAULT_FLAG         VARCHAR(1)  
+,CREATION_DATE        DATETIME    NOT NULL
+,CREATED_BY           INT         NOT NULL
+,LAST_UPDATE_DATE     DATETIME    NOT NULL
+,LAST_UPDATED_BY      INT         NOT NULL
+,PRIMARY KEY (USER_ID, RESPONSIBILITY_ID) 
+) 
+COMMENT="CKS WMS User Responsibility"
+;
+
+INSERT INTO cks_wms_furg (
+USER_ID,RESPONSIBILITY_ID,ENABLED_FLAG,START_DATE,END_DATE,AUTH_DESCRIPTION,DEFAULT_FLAG
+,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY)
+VALUES ( 1, 1, 'Y', SYSDATE(), NULL, 'ksoo CKS HQ Manager','Y',SYSDATE(),-1,SYSDATE(),-1) ;
+
+INSERT INTO cks_wms_furg (
+USER_ID,RESPONSIBILITY_ID,ENABLED_FLAG,START_DATE,END_DATE,AUTH_DESCRIPTION,DEFAULT_FLAG
+,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY)
+VALUES ( 1, 2, 'Y', SYSDATE(), NULL, 'ksoo CKS Store Manager',NULL, SYSDATE(),-1,SYSDATE(),-1) ;
+
+INSERT INTO cks_wms_furg (
+USER_ID,RESPONSIBILITY_ID,ENABLED_FLAG,START_DATE,END_DATE,AUTH_DESCRIPTION,DEFAULT_FLAG
+,CREATION_DATE,CREATED_BY,LAST_UPDATE_DATE,LAST_UPDATED_BY)
+VALUES ( 1, 3, 'Y', SYSDATE(), NULL, 'ksoo CKS Truck Manager',NULL, SYSDATE(),-1,SYSDATE(),-1) ;
+
+
+-----------------------------------
+-- CKS WMS Transaction Types
+-- Table : cks_wms_mtt
+-----------------------------------
+DROP TABLE cks_wms_mtt;
+
+CREATE TABLE cks_wms_mtt( 
+ TRANSACTION_TYPE_ID           INT           NOT NULL
+,TRANSACTION_TYPE_NAME         VARCHAR(80)   NOT NULL
+,TYPE_DESCRIPTION              VARCHAR(240)    
+,TRANSACTION_ACTION_ID         INT         NOT NULL
+,TRANSACTION_SOURCE_TYPE_ID    INT         NOT NULL
+,CREATION_DATE                 DATETIME    NOT NULL
+,CREATED_BY                    INT         NOT NULL
+,LAST_UPDATE_DATE              DATETIME    NOT NULL
+,LAST_UPDATED_BY               INT         NOT NULL
+,PRIMARY KEY (TRANSACTION_TYPE_ID) 
+) 
+COMMENT="CKS WMS Transaction Types"
+;
+
+INSERT INTO cks_wms_mtt VALUES (32, 'Miscellaneous Issue', 'Miscellaneous Issue', 1, 13, SYSDATE(), -1, SYSDATE(), -1);
+INSERT INTO cks_wms_mtt VALUES (33, 'Sales Order Issue', 'Sales Order Issue', 1, 2, SYSDATE(), -1, SYSDATE(), -1);
+INSERT INTO cks_wms_mtt VALUES (35, 'WIP Issue', 'WIP Issue', 1, 5, SYSDATE(), -1, SYSDATE(), -1);
+INSERT INTO cks_wms_mtt VALUES (42, 'Miscellaneous Receipt', 'Miscellaneous Receipt', 27, 13, SYSDATE(), -1, SYSDATE(), -1);
+INSERT INTO cks_wms_mtt VALUES (44, 'WIP Completion', 'WIP Completion', 31, 5, SYSDATE(), -1, SYSDATE(), -1);
+INSERT INTO cks_wms_mtt VALUES (18, 'PO Receipt', 'PO Receipt', 27, 1, SYSDATE(), -1, SYSDATE(), -1);
+INSERT INTO cks_wms_mtt VALUES (2, 'Subinventory Transfer', 'Subinventory Transfer', 2, 13, SYSDATE(), -1, SYSDATE(), -1);
+INSERT INTO cks_wms_mtt VALUES (87, 'Container Pack', 'Container Pack', 50, 13, SYSDATE(), -1, SYSDATE(), -1);
+INSERT INTO cks_wms_mtt VALUES (88, 'Container Unpack', 'Container Unpack', 51, 13, SYSDATE(), -1, SYSDATE(), -1);
+INSERT INTO cks_wms_mtt VALUES (89, 'Container Split', 'Container Split', 52, 13, SYSDATE(), -1, SYSDATE(), -1);
+
+-----------------------------------
+-- cks_wms_lookup
+-----------------------------------
+DROP TABLE cks_wms_lookup;
+
+CREATE TABLE cks_wms_lookup( 
+ LOOKUP_TYPE          VARCHAR(30)  NOT NULL 
+,LOOKUP_CODE          VARCHAR(30)  NOT NULL
+,LOOKUP_MEANING          VARCHAR(80)  NOT NULL
+,LOOKUP_DESCRIPTION      VARCHAR(240)
+,ENABLED_FLAG          VARCHAR(1)   NOT NULL
+,START_DATE_ACTIVE      DATETIME
+,END_DATE_ACTIVE      DATETIME
+,PARENT_LOOKUP_TYPE      VARCHAR(30) 
+,PARENT_LOOKUP_CODE      VARCHAR(30) 
+,CREATED_BY              INT        NOT NULL
+,CREATION_DATE          DATETIME   NOT NULL
+,LAST_UPDATED_BY      INT        NOT NULL
+,LAST_UPDATE_DATE      DATETIME   NOT NULL
+,PRIMARY KEY (LOOKUP_TYPE, LOOKUP_CODE) 
+) 
+COMMENT="CKS WMS Lookup(fnd_lookup_codes)"
+;
+
+-- Warehouse Type
+INSERT INTO cks_wms_lookup VALUES ('ORG_TYPE','MHQ','Main HQ',        NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ORG_TYPE','STR','Sale Store',     NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ORG_TYPE','TRK','Truck',          NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+
+INSERT INTO cks_wms_lookup VALUES ('WH_TYPE','FGS','Finished Goods', NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('WH_TYPE','ASM','Assembly',       NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('WH_TYPE','MTL','Material',       NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('WH_TYPE','WIP','Work in process',NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('WH_TYPE','EQU','Equipment',      NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('WH_TYPE','DEV','R&D',            NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('WH_TYPE','STD','Education&Study',NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+
+INSERT INTO cks_wms_lookup VALUES ('ITEM_TYPE','MTL','Material',        NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_TYPE','FG','Finished Good',    NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_TYPE','ASSY','Assembly',       NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+
+-- Item Catalog Group 관리
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_01','MTL','원재료', NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_02','WOOD','나무', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_01','MTL',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','BAR','각재', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','WOOD',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','PLATE','합판', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','WOOD',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','SLICE','슬라이스', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','WOOD',-1,SYSDATE(),-1,SYSDATE());
+
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_01','FGS','완제품', NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_02','AUTOMATA','오토마타', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_01','FGS',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','HUMAN','각재', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','AUTOMATA',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','ANIMAL','슬라이스', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','AUTOMATA',-1,SYSDATE(),-1,SYSDATE());
+
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_02','TOY','나무장난감', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_01','FGS',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','VEHICLE','운송', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','TOY',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','SWORD','무기', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','TOY',-1,SYSDATE(),-1,SYSDATE());
+
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_02','MACHINE','나무기계', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_01','FGS',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','MECHANIC','나무기구', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MACHINE',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','WOODEN','목공기계', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MACHINE',-1,SYSDATE(),-1,SYSDATE());
+
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_01','ASM','조립부품', NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_02','MECHANIC','나무기구', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_01','ASM',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','GEAR','기어', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MECHANIC',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','BASE','받침대', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MECHANIC',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','STAND','지지대', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MECHANIC',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','CRANK','크랭크', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MECHANIC',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','CAM','캠', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MECHANIC',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','WHEEL','바퀴', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MECHANIC',-1,SYSDATE(),-1,SYSDATE());
+
+
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_01','EQU','설비', NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_02','MACHINE','기계', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_01','EQU',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','MCNC','CNC', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MACHINE',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','MSAW','기계톱', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MACHINE',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','MDRILL','기계드릴', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','MACHINE',-1,SYSDATE(),-1,SYSDATE());
+
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_01','HTL','작업도구', NULL,'Y',SYSDATE(),NULL,NULL,NULL,-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_02','HDRIVER','드라이버', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_01','HTL',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','HDRSET','드라이버SET', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','HDRIVER',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','HDRPLUS','드라이버(+)', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','HDRIVER',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','HDRMINUS','드라이버(-)', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','HDRIVER',-1,SYSDATE(),-1,SYSDATE());
+INSERT INTO cks_wms_lookup VALUES ('ITEM_GROUP_03','HDRLENCH','육각랜치', NULL,'Y',SYSDATE(),NULL,'ITEM_GROUP_02','HDRIVER',-1,SYSDATE(),-1,SYSDATE());
+
+
+-----------------------------------
+-- CKS WMS Organization
+-- Table : cks_wms_org
+-- EX_ORG_TYPE : cks_wms_lookup / ORG_TYPE
+-----------------------------------
+DROP TABLE cks_wms_org;
+
+CREATE TABLE cks_wms_org( 
+ ORGANIZATION_ID          INT    NOT NULL    auto_increment
+,ORGANIZATION_CODE        VARCHAR(10)        
+,ORGANIZATION_NAME        VARCHAR(240)        
+,MASTER_ORGANIZATION_ID   INT         NOT NULL    
+,EX_ORG_TYPE              VARCHAR(10)    
+,CREATION_DATE            DATETIME    NOT NULL    
+,CREATED_BY               INT         NOT NULL    
+,LAST_UPDATE_DATE         DATETIME    NOT NULL    
+,LAST_UPDATED_BY          INT         NOT NULL    
+,PRIMARY KEY (ORGANIZATION_ID) 
+) 
+COMMENT="CKS WMS Organization"
+;
+
+INSERT INTO cks_wms_org VALUES ( 1001, 'CKS-HQ',    'CKS HQ Paju',  1001,'HQ', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_org VALUES ( 1002, 'CKS-ST-01', 'CKS Store #1', 1001,'ST', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_org VALUES ( 1003, 'CKS-TR-01', 'CKS Truck #1', 1001,'TR', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_org VALUES ( 1004, 'CKS-TR-02', 'CKS Truck #2', 1001,'TR', SYSDATE(),-1,SYSDATE(),-1);
+
+
+-----------------------------------
+-- CKS WMS Subinventories
+-- Table : cks_wms_subinv
+-----------------------------------
+DROP TABLE cks_wms_subinv;
+
+CREATE TABLE cks_wms_subinv( 
+ ORGANIZATION_ID             INT           NOT NULL
+,SECONDARY_INVENTORY_NAME    VARCHAR(10)   NOT NULL
+,SUBINVENTORY_TYPE           INT    
+,ASSET_INVENTORY             INT           NOT NULL
+,SUBINV_DESCRIPTION          VARCHAR(50)    
+,ENABLED_FLAG                VARCHAR(1)    NOT NULL
+,DISABLE_DATE                DATETIME    
+,EX_SUBINV_TYPE              VARCHAR(10)    
+,EX_SUBINV_DETAIL            VARCHAR(10)    
+,CREATION_DATE               DATETIME    NOT NULL
+,CREATED_BY                  INT         NOT NULL
+,LAST_UPDATE_DATE            DATETIME    NOT NULL
+,LAST_UPDATED_BY             INT    NOT NULL
+,PRIMARY KEY (ORGANIZATION_ID, SECONDARY_INVENTORY_NAME ) 
+) 
+COMMENT="CKS WMS Subinventories"
+;
+
+INSERT INTO cks_wms_subinv VALUES (1001, 'HQ-MTL', 1, 1, '본사자재창고','Y' ,NULL,'MTL','COMMON', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_subinv VALUES (1001, 'HQ-ASM', 1, 1, '본사반제품창고','Y',NULL,'ASM','COMMON', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_subinv VALUES (1001, 'HQ-EDU', 1, 1, '본사교재창고','Y' ,NULL,'EQU','COMMON', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_subinv VALUES (1001, 'HQ-WIP', 1, 1, '본사제품창고','Y' ,NULL,'WIP','COMMON', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_subinv VALUES (1001, 'HQ-FGS', 1, 1, '본사제품창고','Y' ,NULL,'FGS','COMMON', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_subinv VALUES (1001, 'HQ-EQU', 1, 1, '본사설비창고','Y' ,NULL,'EQU','COMMON', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_subinv VALUES (1002, 'ST-FGS', 1, 1, '매장제품창고','Y' ,NULL,'FGS','COMMON', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_subinv VALUES (1003, 'TR-MTL', 1, 1, '이동트럭자재','Y' ,NULL,'MTL','COMMON', SYSDATE(),-1,SYSDATE(),-1);
+INSERT INTO cks_wms_subinv VALUES (1003, 'TR-FGS', 1, 1, '이동트럭제품','Y' ,NULL,'FGS','COMMON', SYSDATE(),-1,SYSDATE(),-1);
+
+-----------------------------------
+-- CKS WMS Locators
+-- Table : cks_wms_loc
+-- EX_LOCATOR_TYPE / EX_LOCATOR_DETAIL 
+--    Locator의 제품/자재 상세구분 목적으로 사용한다.
+-----------------------------------
+DROP TABLE cks_wms_loc;
+
+CREATE TABLE cks_wms_loc( 
+ INVENTORY_LOCATION_ID    INT    NOT NULL    auto_increment
+,ORGANIZATION_ID          INT    NOT NULL    
+,SEGMENT1                 VARCHAR(40)        
+,LOCATOR_DESCRIPTION      VARCHAR(50)        
+,SUBINVENTORY_CODE        VARCHAR(10)        
+,INVENTORY_LOCATION_TYPE  INT        
+,ENABLED_FLAG             VARCHAR(1)    NOT NULL    
+,DISABLE_DATE             DATETIME        
+,X_COORDINATE             INT        
+,Y_COORDINATE             INT        
+,Z_COORDINATE             INT        
+,EX_LOCATOR_TYPE          VARCHAR(10)    
+,EX_LOCATOR_DETAIL        VARCHAR(10)    
+,CREATION_DATE            DATETIME    NOT NULL    
+,CREATED_BY               INT         NOT NULL    
+,LAST_UPDATE_DATE         DATETIME    NOT NULL    
+,LAST_UPDATED_BY          INT         NOT NULL    
+,PRIMARY KEY ( INVENTORY_LOCATION_ID ) 
+) 
+COMMENT="CKS WMS Locators"
+;
+
+ALTER TABLE cks_wms_loc ADD UNIQUE INDEX cks_wms_loc_ux1 (ORGANIZATION_ID, INVENTORY_LOCATION_ID);
+
+ALTER TABLE cks_wms_loc ADD UNIQUE INDEX cks_wms_loc_ux2 (ORGANIZATION_ID, SEGMENT1);
+
+INSERT INTO cks_wms_loc ( ORGANIZATION_ID ,SEGMENT1, LOCATOR_DESCRIPTION ,SUBINVENTORY_CODE, INVENTORY_LOCATION_TYPE
+, ENABLED_FLAG ,DISABLE_DATE ,X_COORDINATE, Y_COORDINATE, Z_COORDINATE ,EX_LOCATOR_TYPE   ,EX_LOCATOR_DETAIL 
+, CREATION_DATE, CREATED_BY, LAST_UPDATE_DATE, LAST_UPDATED_BY ) VALUES 
+( 1001, 'M-WC-COM','M-WC-COM','HQ-MTL',1,'Y',NULL,0,0,0,'WOOD','COMMON',SYSDATE(),-1,SYSDATE(),-1);
+
+INSERT INTO cks_wms_loc ( ORGANIZATION_ID ,SEGMENT1, LOCATOR_DESCRIPTION ,SUBINVENTORY_CODE, INVENTORY_LOCATION_TYPE
+, ENABLED_FLAG ,DISABLE_DATE ,X_COORDINATE, Y_COORDINATE, Z_COORDINATE ,EX_LOCATOR_TYPE   ,EX_LOCATOR_DETAIL 
+, CREATION_DATE, CREATED_BY, LAST_UPDATE_DATE, LAST_UPDATED_BY ) VALUES 
+( 1001, 'A-WG-COM','A-WG-COM','HQ-ASM',1,'Y',NULL,0,0,0,'WOOD','GEAR',SYSDATE(),-1,SYSDATE(),-1);
+
+INSERT INTO cks_wms_loc ( ORGANIZATION_ID ,SEGMENT1, LOCATOR_DESCRIPTION ,SUBINVENTORY_CODE, INVENTORY_LOCATION_TYPE
+, ENABLED_FLAG ,DISABLE_DATE ,X_COORDINATE, Y_COORDINATE, Z_COORDINATE ,EX_LOCATOR_TYPE   ,EX_LOCATOR_DETAIL 
+, CREATION_DATE, CREATED_BY, LAST_UPDATE_DATE, LAST_UPDATED_BY ) VALUES 
+( 1001, 'F-WA-COM','F-WA-COM','HQ-FGS',1,'Y',NULL,0,0,0,'WOOD','AUTOMATA',SYSDATE(),-1,SYSDATE(),-1);
+
+INSERT INTO cks_wms_loc ( ORGANIZATION_ID ,SEGMENT1, LOCATOR_DESCRIPTION ,SUBINVENTORY_CODE, INVENTORY_LOCATION_TYPE
+, ENABLED_FLAG ,DISABLE_DATE ,X_COORDINATE, Y_COORDINATE, Z_COORDINATE ,EX_LOCATOR_TYPE   ,EX_LOCATOR_DETAIL 
+, CREATION_DATE, CREATED_BY, LAST_UPDATE_DATE, LAST_UPDATED_BY ) VALUES 
+( 1001, 'F-WM-COM','F-WM-COM','HQ-FGS',1,'Y',NULL,0,0,0,'WOOD','MACHINE',SYSDATE(),-1,SYSDATE(),-1);
+
+INSERT INTO cks_wms_loc ( ORGANIZATION_ID ,SEGMENT1, LOCATOR_DESCRIPTION ,SUBINVENTORY_CODE, INVENTORY_LOCATION_TYPE
+, ENABLED_FLAG ,DISABLE_DATE ,X_COORDINATE, Y_COORDINATE, Z_COORDINATE ,EX_LOCATOR_TYPE   ,EX_LOCATOR_DETAIL 
+, CREATION_DATE, CREATED_BY, LAST_UPDATE_DATE, LAST_UPDATED_BY ) VALUES 
+( 1001, 'F-WP-COM','F-WP-COM','HQ-FGS',1,'Y',NULL,0,0,0,'WOOD','PUZZLE',SYSDATE(),-1,SYSDATE(),-1);
+
+INSERT INTO cks_wms_loc ( ORGANIZATION_ID ,SEGMENT1, LOCATOR_DESCRIPTION ,SUBINVENTORY_CODE, INVENTORY_LOCATION_TYPE
+, ENABLED_FLAG ,DISABLE_DATE ,X_COORDINATE, Y_COORDINATE, Z_COORDINATE ,EX_LOCATOR_TYPE   ,EX_LOCATOR_DETAIL 
+, CREATION_DATE, CREATED_BY, LAST_UPDATE_DATE, LAST_UPDATED_BY ) VALUES 
+( 1001, 'E-EQ-COM','E-EQ-COM','HQ-EQU',1,'Y',NULL,0,0,0,'EQUIP','COMMON',SYSDATE(),-1,SYSDATE(),-1);
+
+INSERT INTO cks_wms_loc ( ORGANIZATION_ID ,SEGMENT1, LOCATOR_DESCRIPTION ,SUBINVENTORY_CODE, INVENTORY_LOCATION_TYPE
+, ENABLED_FLAG ,DISABLE_DATE ,X_COORDINATE, Y_COORDINATE, Z_COORDINATE ,EX_LOCATOR_TYPE   ,EX_LOCATOR_DETAIL 
+, CREATION_DATE, CREATED_BY, LAST_UPDATE_DATE, LAST_UPDATED_BY ) VALUES 
+( 1001, 'E-TL-COM','E-TL-COM','HQ-EQU',1,'Y',NULL,0,0,0,'EQUIP','TOOL',SYSDATE(),-1,SYSDATE(),-1);
+
+-----------------------------------
+-- CKS WMS Item Catalog Group
+-- Table : cks_wms_micg
+--   SEGMENT1 : cks_wms_lookup / ITEM_GROUP_01
+--   SEGMENT2 : cks_wms_lookup / ITEM_GROUP_02
+--   SEGMENT3 : cks_wms_lookup / ITEM_GROUP_03
+-----------------------------------
+DROP TABLE cks_wms_micg;
+
+CREATE TABLE cks_wms_micg( 
+ ITEM_CATALOG_GROUP_ID    INT           NOT NULL    auto_increment
+,SEGMENT1                 VARCHAR(40)   NOT NULL    
+,SEGMENT2                 VARCHAR(40)        
+,SEGMENT3                 VARCHAR(40)        
+,SEGMENT4                 VARCHAR(40)        
+,SEGMENT5                 VARCHAR(40)        
+,SEGMENT6                 VARCHAR(40)        
+,SEGMENT7                 VARCHAR(40)        
+,SEGMENT8                 VARCHAR(40)        
+,SEGMENT9                 VARCHAR(40)        
+,SEGMENT10                VARCHAR(40)        
+,CATALOG_DESCRIPTION      VARCHAR(240)        
+,PARENT_CATALOG_GROUP_ID  INT        
+,ENABLED_FLAG             VARCHAR(1)  NOT NULL    
+,INACTIVE_DATE            DATETIME        
+,CREATION_DATE            DATETIME    NOT NULL    
+,CREATED_BY               INT         NOT NULL    
+,LAST_UPDATE_DATE         DATETIME    NOT NULL    
+,LAST_UPDATED_BY          INT         NOT NULL    
+,PRIMARY KEY (ITEM_CATALOG_GROUP_ID) 
+) 
+COMMENT="CKS WMS Item Catalog Group"
+;
+
+-- MTL - WOOD - BAR - 2X2
+-- MTL - WOOD - BAR - 2X4
+-- MTL - WOOD - PLYWOOD - 2T*1220*2440
+
+INSERT INTO cks_wms_micg
+( SEGMENT1,SEGMENT2,SEGMENT3,SEGMENT4,CATALOG_DESCRIPTION,PARENT_CATALOG_GROUP_ID     
+,ENABLED_FLAG  ,INACTIVE_DATE  ,CREATION_DATE  ,CREATED_BY ,LAST_UPDATE_DATE ,LAST_UPDATED_BY  ) 
+VALUES ('MTL','WOOD','BAR','2X2','Wood Bar 2X2',NULL,'Y',NULL,SYSDATE(),-1,SYSDATE(),-1);
+
+INSERT INTO cks_wms_micg
+( SEGMENT1,SEGMENT2,SEGMENT3,SEGMENT4,CATALOG_DESCRIPTION,PARENT_CATALOG_GROUP_ID     
+,ENABLED_FLAG  ,INACTIVE_DATE  ,CREATION_DATE  ,CREATED_BY ,LAST_UPDATE_DATE ,LAST_UPDATED_BY  ) 
+VALUES ('MTL','WOOD','BAR','2X4','Wood Bar 2X4',NULL,'Y',NULL,SYSDATE(),-1,SYSDATE(),-1);
+
+-- EQU - CNC - G-TYPE - S
+INSERT INTO cks_wms_micg
+( SEGMENT1,SEGMENT2,SEGMENT3,SEGMENT4,CATALOG_DESCRIPTION,PARENT_CATALOG_GROUP_ID     
+,ENABLED_FLAG  ,INACTIVE_DATE  ,CREATION_DATE  ,CREATED_BY ,LAST_UPDATE_DATE ,LAST_UPDATED_BY  ) 
+VALUES ('EQU','CNC','G-TYPE','S','CNC G Type Small',NULL,'Y',NULL,SYSDATE(),-1,SYSDATE(),-1);
+
+-----------------------------------
+-- CKS WMS Serial Sequence
+-- Table : cks_wms_msn_seq
+-----------------------------------
+DROP TABLE cks_wms_item_seq;
+
+CREATE TABLE cks_wms_item_seq( 
+ ITEM_PREFIX   VARCHAR(4) NOT NULL        
+,ITEM_SEQ_NO   INT    NOT NULL DEFAULT 0
+,PRIMARY KEY ( ITEM_PREFIX  ) 
+) 
+COMMENT="CKS WMS Item Sequence"
+;
+
+-----------------------------------
+-- CKS WMS Master Item
+-- Table : cks_wms_master
+-----------------------------------
+DROP TABLE cks_wms_master;
+
+CREATE TABLE cks_wms_master( 
+ INVENTORY_ITEM_ID      INT         NOT NULL    auto_increment
+,INVENTORY_ITEM_CODE    VARCHAR(40)        
+,ITEM_DESCRIPTION       VARCHAR(240)        
+,MASTER_ORGANIZATION_ID INT         NOT NULL
+,PLAN_DOCUMENT_NO       VARCHAR(240)        
+,ITEM_IMAGE             BLOB    
+,CREATION_DATE          DATETIME    NOT NULL    
+,CREATED_BY             INT         NOT NULL     
+,LAST_UPDATE_DATE       DATETIME    NOT NULL    
+,LAST_UPDATED_BY        INT         NOT NULL    
+,PRIMARY KEY (INVENTORY_ITEM_ID) 
+) 
+COMMENT="CKS WMS Master Item"
+;
+
+ALTER TABLE cks_wms_master ADD UNIQUE INDEX cks_wms_master_ux1 (MASTER_ORGANIZATION_ID, INVENTORY_ITEM_CODE);
+
+-----------------------------------
+-- CKS WMS Organization Item
+-- Table : cks_wms_item
+-- SERIAL_NUMBER_CONTROL_CODE : 5 - Serial Control
+-----------------------------------
+DROP TABLE cks_wms_item;
+
+CREATE TABLE cks_wms_item( 
+ ORGANIZATION_ID             INT    NOT NULL    
+,INVENTORY_ITEM_ID           INT    NOT NULL    
+,SEGMENT1                    VARCHAR(40)        
+,ITEM_TYPE                   VARCHAR(30)        
+,ITEM_DESCRIPTION            VARCHAR(240)        
+,ITEM_SPEC                   VARCHAR(240)        
+,ITEM_CATALOG_GROUP_ID       INT        
+,SERIAL_NUMBER_CONTROL_CODE  INT DEFAULT 1  
+,PRIMARY_UOM_CODE            VARCHAR(3)     
+,ENABLED_FLAG                VARCHAR(1) DEFAULT 'Y'   NOT NULL 
+,INVENTORY_ITEM_FLAG         VARCHAR(1)    DEFAULT 'Y'   NOT NULL
+,STOCK_ENABLED_FLAG             VARCHAR(1)    DEFAULT 'Y'   NOT NULL
+,BOM_ENABLED_FLAG            VARCHAR(1) DEFAULT 'N'   NOT NULL
+,BUILD_IN_WIP_FLAG           VARCHAR(1) DEFAULT 'N'   NOT NULL
+,PURCHASING_ITEM_FLAG        VARCHAR(1) DEFAULT 'N'   NOT NULL
+,SHIPPABLE_ITEM_FLAG         VARCHAR(1) DEFAULT 'N'   NOT NULL
+,CUSTOMER_ORDER_FLAG         VARCHAR(1) DEFAULT 'N'   NOT NULL
+,CREATION_DATE               DATETIME    NOT NULL    
+,CREATED_BY                  INT         NOT NULL    
+,LAST_UPDATE_DATE            DATETIME    NOT NULL    
+,LAST_UPDATED_BY             INT         NOT NULL      
+,PRIMARY KEY (ORGANIZATION_ID, INVENTORY_ITEM_ID) 
+) 
+COMMENT="CKS WMS Organization Item"
+;
+
+ALTER TABLE cks_wms_item ADD INDEX cks_wms_item_nx1 
+(ORGANIZATION_ID, SEGMENT1);
+
+ALTER TABLE cks_wms_item ADD INDEX cks_wms_item_nx2 
+(ORGANIZATION_ID, ITEM_DESCRIPTION);
+
+
+-----------------------------------
+-- CKS WMS Serial Sequence
+-- Table : cks_wms_msn_seq
+-----------------------------------
+DROP TABLE cks_wms_msn_seq;
+
+CREATE TABLE cks_wms_msn_seq( 
+ ORGANIZATION_ID         INT    NOT NULL    
+,SERIAL_PREFIX           VARCHAR(2) NOT NULL        
+,SERIAL_DATE_CODE        VARCHAR(6) NOT NULL        
+,SERIAL_SEQ_NO           INT    NOT NULL DEFAULT 0
+,PRIMARY KEY ( ORGANIZATION_ID, SERIAL_DATE_CODE  ) 
+) 
+COMMENT="CKS WMS Serial Sequence"
+;
+
+-----------------------------------
+-- CKS WMS Serial Numbers
+-- Table : cks_wms_msn
+-- CURRENT_STATUS
+-- 1 Defined but not used 
+-- 3 Resides in stores 
+-- 4 Issued out of stores 
+-- 5 Resides in intransit 
+-- 6 Pending status 
+-- 7 Resides in receiving 
+-- 8 Resides in WIP 
+-----------------------------------
+DROP TABLE cks_wms_msn;
+
+CREATE TABLE cks_wms_msn( 
+ SERIAL_NUMBER                VARCHAR(30)    NOT NULL
+,INVENTORY_ITEM_ID            INT    NOT NULL
+,CURRENT_ORGANIZATION_ID      INT    NOT NULL
+,CURRENT_SUBINVENTORY_CODE    VARCHAR(10)    
+,CURRENT_LOCATOR_ID           INT    
+,CURRENT_STATUS               INT    
+,LAST_TXN_SOURCE_TYPE_ID      INT    
+,LAST_TRANSACTION_ID          INT    
+,LAST_RECEIPT_ISSUE_TYPE      INT    
+,LAST_TXN_SOURCE_NAME         VARCHAR(80)    
+,LAST_TXN_SOURCE_ID           INT    
+,LPN_ID                       INT    
+,CREATION_DATE                DATETIME    NOT NULL
+,CREATED_BY                   INT         NOT NULL
+,LAST_UPDATE_DATE             DATETIME    NOT NULL
+,LAST_UPDATED_BY              INT         NOT NULL
+,PRIMARY KEY ( SERIAL_NUMBER ) 
+) 
+COMMENT="CKS WMS Serial Numbers"
+;
+
+ALTER TABLE cks_wms_msn ADD INDEX cks_wms_msn_nx1 
+(CURRENT_ORGANIZATION_ID, CURRENT_SUBINVENTORY_CODE, CURRENT_LOCATOR_ID);
+
+ALTER TABLE cks_wms_msn ADD INDEX cks_wms_msn_nx2 
+(CURRENT_ORGANIZATION_ID, INVENTORY_ITEM_ID );
+
+-----------------------------------
+-- CKS WMS Onhand Quantities
+-- Table : cks_wms_moq
+-----------------------------------
+DROP TABLE cks_wms_moq;
+
+CREATE TABLE cks_wms_moq( 
+ ORGANIZATION_ID               INT         NOT NULL
+,INVENTORY_ITEM_ID             INT         NOT NULL
+,SUBINVENTORY_CODE             VARCHAR(10) NOT NULL
+,LOCATOR_ID                    INT         NOT NULL
+,LPN_ID                        INT    
+,PRIMARY_TRANSACTION_QUANTITY  INT         NOT NULL
+,TRANSACTION_QUANTITY          INT         NOT NULL
+,TRANSACTION_UOM_CODE          VARCHAR(3)  NOT NULL
+,DATE_RECEIVED                 DATETIME    
+,CREATION_DATE                 DATETIME    NOT NULL
+,CREATED_BY                    INT         NOT NULL
+,LAST_UPDATE_DATE              DATETIME    NOT NULL
+,LAST_UPDATED_BY               INT         NOT NULL
+) 
+COMMENT="CKS WMS Onhand Quantities"
+;
+
+ALTER TABLE cks_wms_moq ADD INDEX cks_wms_moq_nx1 
+(ORGANIZATION_ID, SUBINVENTORY_CODE, LOCATOR_ID);
+
+ALTER TABLE cks_wms_moq ADD INDEX cks_wms_moq_nx2 
+(ORGANIZATION_ID, INVENTORY_ITEM_ID );
+
+ALTER TABLE cks_wms_moq ADD INDEX cks_wms_moq_nx3 
+(ORGANIZATION_ID, LPN_ID );
+
+-----------------------------------
+-- CKS WMS Transactions
+-- Table : cks_wms_mmt
+-----------------------------------
+DROP TABLE cks_wms_mmt;
+
+CREATE TABLE cks_wms_mmt( 
+ TRANSACTION_ID              INT    NOT NULL    auto_increment
+,ORGANIZATION_ID             INT    NOT NULL    
+,SUBINVENTORY_CODE           VARCHAR(10)        
+,LOCATOR_ID                  INT        
+,INVENTORY_ITEM_ID           INT    NOT NULL    
+,TRANSACTION_TYPE_ID         INT    NOT NULL    
+,TRANSACTION_ACTION_ID       INT    NOT NULL    
+,TRANSACTION_SOURCE_TYPE_ID  INT    NOT NULL    
+,TRANSACTION_SOURCE_ID       INT        
+,TRANSACTION_SOURCE_NAME     VARCHAR(80)        
+,TRANSACTION_QUANTITY        INT         NOT NULL    
+,TRANSACTION_UOM             VARCHAR(3)  NOT NULL    
+,PRIMARY_QUANTITY            INT         NOT NULL    
+,TRANSACTION_DATE            DATETIME    NOT NULL    
+,TRANSACTION_REFERENCE       VARCHAR(240)        
+,LPN_ID                      INT        
+,CONTENT_LPN_ID              INT        
+,TRANSFER_ORGANIZATION_ID    INT        
+,TRANSFER_SUBINVENTORY       VARCHAR(10)        
+,TRANSFER_LOCATOR_ID         INT        
+,TRANSFER_LPN_ID             INT        
+,CREATION_DATE               DATETIME    NOT NULL    
+,CREATED_BY                  INT         NOT NULL    
+,LAST_UPDATE_DATE            DATETIME    NOT NULL    
+,LAST_UPDATED_BY             INT         NOT NULL    
+,PRIMARY KEY ( TRANSACTION_ID ) 
+) 
+COMMENT="CKS WMS Transactions"
+;
+
+ALTER TABLE cks_wms_mmt ADD INDEX cks_wms_mmt_nx1 
+(ORGANIZATION_ID, SUBINVENTORY_CODE, LOCATOR_ID);
+
+ALTER TABLE cks_wms_mmt ADD INDEX cks_wms_mmt_nx2 
+(ORGANIZATION_ID, TRANSACTION_DATE );
+
+ALTER TABLE cks_wms_mmt ADD INDEX cks_wms_mmt_nx3 
+(ORGANIZATION_ID, INVENTORY_ITEM_ID );
+
+ALTER TABLE cks_wms_mmt ADD INDEX cks_wms_mmt_nx4 
+(ORGANIZATION_ID, LPN_ID );
+
+-----------------------------------
+-- CKS WMS Unit Transactions
+-- Table : cks_wms_mut
+-----------------------------------
+DROP TABLE cks_wms_mut;
+
+CREATE TABLE cks_wms_mut( 
+ TRANSACTION_ID              INT          NOT NULL
+,SERIAL_NUMBER               VARCHAR(30)  NOT NULL
+,INVENTORY_ITEM_ID           INT          NOT NULL
+,ORGANIZATION_ID             INT          NOT NULL
+,SUBINVENTORY_CODE           VARCHAR(10)    
+,LOCATOR_ID                  INT    
+,TRANSACTION_DATE            DATETIME    NOT NULL
+,TRANSACTION_SOURCE_TYPE_ID  INT         NOT NULL
+,TRANSACTION_SOURCE_ID       INT    
+,TRANSACTION_SOURCE_NAME     VARCHAR(240)    
+,RECEIPT_ISSUE_TYPE          INT         NOT NULL
+,CREATION_DATE               DATETIME    NOT NULL
+,CREATED_BY                  INT         NOT NULL
+,LAST_UPDATE_DATE            DATETIME    NOT NULL
+,LAST_UPDATED_BY             INT         NOT NULL
+,PRIMARY KEY ( TRANSACTION_ID, SERIAL_NUMBER ) 
+) 
+COMMENT="CKS WMS Unit Transactions"
+;
+
+-----------------------------------
+-- CKS WMS LPN
+-- Table : cks_wms_lpn
+-----------------------------------
+DROP TABLE cks_wms_lpn_seq;
+
+CREATE TABLE cks_wms_lpn_seq( 
+ ORGANIZATION_ID      INT    NOT NULL    
+,LPN_DATE_CODE        VARCHAR(6) NOT NULL        
+,LPN_SEQ_NO           INT    NOT NULL DEFAULT 0
+,PRIMARY KEY ( ORGANIZATION_ID, LPN_DATE_CODE  ) 
+) 
+COMMENT="CKS WMS LPN Sequence"
+;
+
+-----------------------------------
+-- CKS WMS LPN
+-- Table : cks_wms_lpn
+-----------------------------------
+-- LPN Contexts
+-- 1  Resides in Inventory
+-- 2  Resides in WIP
+-- 3  Resides in Receiving
+-- 4  Issued out of Stores
+-- 5  Defined but not used
+-- 6  Resides in Intransit
+-- 7  Resides in Vendor
+-- 8  Packing content
+-- 9  Loaded to Dock
+-- 10 Prepack for WIP
+-- 11 Picked
+-- EX_LPN_TYPE - P:Pallet, B:Box 
+-----------------------------------
+DROP TABLE cks_wms_lpn;
+
+CREATE TABLE cks_wms_lpn( 
+ LPN_ID               INT    NOT NULL    auto_increment
+,LICENSE_PLATE_NUMBER VARCHAR(30)    NOT NULL    
+,ORGANIZATION_ID      INT    NOT NULL    
+,SUBINVENTORY_CODE    VARCHAR(10)        
+,LOCATOR_ID           INT        
+,PARENT_LPN_ID        INT        
+,OUTERMOST_LPN_ID     INT        
+,LPN_CONTEXT          INT         NOT NULL    
+,EX_LPN_TYPE          VARCHAR(1)  NOT NULL    
+,CREATION_DATE        DATETIME    NOT NULL    
+,CREATED_BY           INT         NOT NULL    
+,LAST_UPDATE_DATE     DATETIME    NOT NULL    
+,LAST_UPDATED_BY      INT         NOT NULL    
+,PRIMARY KEY ( LPN_ID  ) 
+) 
+COMMENT="CKS WMS LPN"
+;
+
+ALTER TABLE cks_wms_lpn ADD INDEX cks_wms_lpn_nx1 
+(ORGANIZATION_ID, SUBINVENTORY_CODE, LOCATOR_ID, LPN_CONTEXT );
+
+ALTER TABLE cks_wms_lpn ADD INDEX cks_wms_lpn_nx2 
+(ORGANIZATION_ID, PARENT_LPN_ID );
+
+ALTER TABLE cks_wms_lpn ADD INDEX cks_wms_lpn_nx3 
+(ORGANIZATION_ID, OUTERMOST_LPN_ID );
+
+-----------------------------------
+-- CKS WMS LPN Contents
+-- Table : cks_wms_wlc
+-----------------------------------
+DROP TABLE cks_wms_wlc;
+
+CREATE TABLE cks_wms_wlc( 
+ LPN_CONTENT_ID        INT    NOT NULL    auto_increment
+,PARENT_LPN_ID         INT    NOT NULL    
+,INVENTORY_ITEM_ID     INT    NOT NULL    
+,PRIMARY_QUANTITY      INT        
+,TRANSACTION_QUANTITY  INT        
+,TRANSACTION_UOM_CODE  VARCHAR(3)        
+,ORGANIZATION_ID       INT         NOT NULL    
+,CREATION_DATE         DATETIME    NOT NULL    
+,CREATED_BY            INT         NOT NULL     
+,LAST_UPDATE_DATE      DATETIME    NOT NULL    
+,LAST_UPDATED_BY       INT         NOT NULL    
+,PRIMARY KEY ( LPN_CONTENT_ID  ) 
+) 
+COMMENT="CKS WMS LPN Contents"
+;
+
+ALTER TABLE cks_wms_wlc ADD INDEX cks_wms_wlc_nx1 
+(ORGANIZATION_ID, PARENT_LPN_ID );
+
+ALTER TABLE cks_wms_wlc ADD INDEX cks_wms_wlc_nx2 
+(ORGANIZATION_ID, INVENTORY_ITEM_ID );
+
+-----------------------------------
+-- CKS WMS LPN History
+-- Table : cks_wms_wlh
+-----------------------------------
+DROP TABLE cks_wms_wlh;
+
+CREATE TABLE cks_wms_wlh( 
+ LPN_HISTORY_ID               INT    NOT NULL    auto_increment
+,PARENT_LPN_ID                INT        
+,PARENT_LICENSE_PLATE_NUMBER  VARCHAR(30)        
+,LPN_ID                       INT        
+,LICENSE_PLATE_NUMBER         VARCHAR(30)  
+,SERIAL_NUMBER                VARCHAR(30)       
+,INVENTORY_ITEM_ID            INT        
+,TRANSACTION_QUANTITY         INT        
+,TRANSACTION_UOM_CODE         VARCHAR(3)        
+,ORGANIZATION_ID              INT        
+,SUBINVENTORY_CODE            VARCHAR(10)        
+,LOCATOR_ID                   INT        
+,OPERATION_MODE               INT    NOT NULL    
+,LPN_CONTEXT                  INT        
+,OUTERMOST_LPN_ID             INT        
+,TO_SERIAL_NUMBER             VARCHAR(30)        
+,LAST_UPDATE_DATE             DATETIME    NOT NULL    
+,LAST_UPDATED_BY              INT         NOT NULL    
+,CREATION_DATE                DATETIME    NOT NULL    
+,CREATED_BY                   INT         NOT NULL    
+,PRIMARY KEY ( LPN_HISTORY_ID  ) 
+) 
+COMMENT="CKS WMS LPN History"
+;
+
+ALTER TABLE cks_wms_wlh ADD INDEX cks_wms_wlh_nx1 
+(ORGANIZATION_ID, PARENT_LPN_ID );
+
+ALTER TABLE cks_wms_wlh ADD INDEX cks_wms_wlh_nx2 
+(ORGANIZATION_ID, LPN_ID );
+
+ALTER TABLE cks_wms_wlh ADD INDEX cks_wms_wlh_nx3 
+(ORGANIZATION_ID, OUTERMOST_LPN_ID );
+
+ALTER TABLE cks_wms_wlh ADD INDEX cks_wms_wlh_nx4
+(ORGANIZATION_ID, SUBINVENTORY_CODE, LOCATOR_ID, INVENTORY_ITEM_ID );
+
+ALTER TABLE cks_wms_wlh ADD INDEX cks_wms_wlh_nx5
+(ORGANIZATION_ID, INVENTORY_ITEM_ID );
+
+ALTER TABLE cks_wms_wlh ADD INDEX cks_wms_wlh_nx6
+(ORGANIZATION_ID, TO_SERIAL_NUMBER );
+
+-----------------------------------
+-- CKS WMS BOM
+-- Table : cks_wms_bom
+-----------------------------------
+DROP TABLE cks_wms_bom;
+
+CREATE TABLE cks_wms_bom( 
+ BILL_SEQUENCE_ID    INT        NOT NULL auto_increment
+,ORGANIZATION_ID     INT        NOT NULL
+,ASSEMBLY_ITEM_ID    INT        NOT NULL
+,ASSEMBLY_TYPE       INT        NOT NULL
+,CREATION_DATE       DATETIME        NOT NULL
+,CREATED_BY          INT        NOT NULL
+,LAST_UPDATE_DATE    DATETIME        NOT NULL
+,LAST_UPDATED_BY     INT        NOT NULL
+,PRIMARY KEY ( BILL_SEQUENCE_ID  ) 
+) 
+COMMENT="CKS WMS BOM"
+;
+
+ALTER TABLE cks_wms_bom ADD UNIQUE INDEX cks_wms_bom_ux1 
+(ORGANIZATION_ID, ASSEMBLY_ITEM_ID);
+
+-----------------------------------
+-- CKS WMS BOM Component
+-- Table : cks_wms_bic
+-----------------------------------
+DROP TABLE cks_wms_bic;
+
+CREATE TABLE cks_wms_bic( 
+ COMPONENT_SEQUENCE_ID  INT        NOT NULL auto_increment
+,BILL_SEQUENCE_ID       INT        NOT NULL
+,COMPONENT_ITEM_ID      INT        NOT NULL
+,ITEM_NUM               INT        
+,COMPONENT_QUANTITY     INT        NOT NULL
+,EFFECTIVITY_DATE       DATETIME   NOT NULL
+,DISABLE_DATE           DATETIME        
+,COMPONENT_REMARKS      VARCHAR(240)        
+,CREATION_DATE          DATETIME   NOT NULL
+,CREATED_BY             INT        NOT NULL
+,LAST_UPDATE_DATE       DATETIME   NOT NULL
+,LAST_UPDATED_BY        INT        NOT NULL
+,PRIMARY KEY ( COMPONENT_SEQUENCE_ID  ) 
+) 
+COMMENT="CKS WMS BOM Component"
+;
+
+ALTER TABLE cks_wms_bic ADD UNIQUE INDEX cks_wms_bic_ux1 
+(BILL_SEQUENCE_ID, COMPONENT_ITEM_ID);

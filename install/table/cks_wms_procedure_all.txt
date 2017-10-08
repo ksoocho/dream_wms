@@ -1,0 +1,181 @@
+------------------------------------------------
+-- Procedure Name : pr_wms_insert_lpn_history
+-- Description    : LPN Transaction History 
+------------------------------------------------
+
+CREATE DEFINER=`cksoonew`@`localhost` PROCEDURE `pr_wms_insert_lpn_history`(
+    IN p_parent_lpn_id     INT,
+    IN p_parent_lpn        VARCHAR(30),
+    IN p_lpn_id            INT,
+    IN p_lpn               VARCHAR(30),
+    IN p_item_id           INT,
+    IN p_serial_number     VARCHAR(30),
+    IN p_qty               INT,
+    IN p_uom               VARCHAR(10),
+    IN p_org_id            INT,
+    IN p_subinv_code       VARCHAR(20),
+    IN p_locator_id        INT,
+    IN p_lpn_context       INT,
+    IN p_outer_most_lpn_id INT,
+    IN p_to_serial_number  VARCHAR(30),
+    IN p_operation_mode    INT,
+    IN p_user_id           INT,
+    IN p_txn_id            INT,
+    OUT x_returnCode       VARCHAR(5),
+    OUT x_returnMsg        VARCHAR(255)
+)
+BEGIN
+
+DECLARE v_serial_number VARCHAR(30);
+DECLARE v_data_count    INT;
+
+DECLARE v_process      VARCHAR(10);
+DECLARE v_returnCode   VARCHAR(5);
+DECLARE v_returnMsg    VARCHAR(255);
+DECLARE v_check_count  INT DEFAULT 0;   
+
+DECLARE done INT DEFAULT FALSE;
+
+-- 커서 - Serial Number
+DECLARE c_serial CURSOR FOR 
+    SELECT serial_number
+    FROM cks_wms_mut mut
+    WHERE mut.transaction_id = p_trx_id;
+
+-- 커서가 마지막에 도착할 때의 상태값
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+BEGIN
+    SET x_returnCode = 'E';
+    SET x_returnMsg =  'An error has occurred';
+    ROLLBACK;
+END;
+
+START TRANSACTION; 
+
+-- Common Code check
+SET v_returnCode = 'S';
+SET v_returnMsg = 'Success!!'; 
+
+SET v_process = '100000';
+
+IF ( p_trx_id IS NOT NULL ) THEN
+
+   OPEN c_serial;
+   
+   read_loop: LOOP
+   
+   FETCH c_serial INTO v_serial_number ;
+   
+    SET v_data_count = v_data_count +1 ; 
+    
+    INSERT INTO cks_wms_wlh
+    (PARENT_LPN_ID        
+    ,PARENT_LICENSE_PLATE_NUMBER       
+    ,LPN_ID
+    ,LICENSE_PLATE_NUMBER 
+    ,SERIAL_NUMBER
+    ,INVENTORY_ITEM_ID       
+    ,TRANSACTION_QUANTITY      
+    ,TRANSACTION_UOM_CODE      
+    ,ORGANIZATION_ID
+    ,SUBINVENTORY_CODE
+    ,LOCATOR_ID  
+    ,OPERATION_MODE   
+    ,LPN_CONTEXT  
+    ,OUTERMOST_LPN_ID   
+    ,TO_SERIAL_NUMBER  
+    ,LAST_UPDATE_DATE   
+    ,LAST_UPDATED_BY  
+    ,CREATION_DATE  
+    ,CREATED_BY        
+    ) VALUES 
+    (p_parent_lpn_id
+     ,p_parent_lpn
+     ,p_lpn_id
+     ,p_lpn 
+     ,v_serial_number
+     ,p_item_id
+     ,1 -- p_qty
+     ,p_uom
+     ,p_org_id
+     ,p_subinv_code
+     ,p_locator_id
+     ,p_operation_mode
+     ,p_lpn_context
+     ,p_outer_most_lpn_id
+     ,v_serial_number
+     ,DATE(SYSDATE())
+     ,p_user_id
+     ,DATE(SYSDATE())
+     ,p_user_id
+    );
+    
+    -- 커서가 마지막 로우면 Loop를 빠져나간다. 
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+   
+   END LOOP;
+   
+   CLOSE c_serial;
+
+ELSE
+
+    INSERT INTO cks_wms_wlh
+    (PARENT_LPN_ID        
+    ,PARENT_LICENSE_PLATE_NUMBER       
+    ,LPN_ID
+    ,LICENSE_PLATE_NUMBER 
+    ,SERIAL_NUMBER
+    ,INVENTORY_ITEM_ID       
+    ,TRANSACTION_QUANTITY      
+    ,TRANSACTION_UOM_CODE      
+    ,ORGANIZATION_ID
+    ,SUBINVENTORY_CODE
+    ,LOCATOR_ID  
+    ,OPERATION_MODE   
+    ,LPN_CONTEXT  
+    ,OUTERMOST_LPN_ID   
+    ,TO_SERIAL_NUMBER  
+    ,LAST_UPDATE_DATE   
+    ,LAST_UPDATED_BY  
+    ,CREATION_DATE  
+    ,CREATED_BY        
+    ) VALUES 
+    (p_parent_lpn_id
+     ,p_parent_lpn
+     ,p_lpn_id
+     ,p_lpn 
+     ,NULL
+     ,p_item_id
+     ,p_qty
+     ,p_uom
+     ,p_org_id
+     ,p_subinv_code
+     ,p_locator_id
+     ,p_operation_mode
+     ,p_lpn_context
+     ,p_outer_most_lpn_id
+     ,NULL
+     ,DATE(SYSDATE())
+     ,p_user_id
+     ,SYSDATE()
+     ,DATE(SYSDATE())
+    );  
+
+END IF;
+
+IF v_returnCode = 'S' THEN
+    SET x_returnCode = 'S';
+    SET x_returnMsg = v_returnMsg; 
+    COMMIT;
+ ELSE
+    SET x_returnCode = 'E';
+    SET x_returnMsg = CONCAT('Error-',v_process,'-',v_returnMsg);
+    ROLLBACK;
+ END IF;
+
+
+END
